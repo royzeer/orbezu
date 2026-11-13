@@ -130,3 +130,18 @@ describe('raíz de la API', () => {
     expect(res.headers.location).toBe('https://orbezu.vercel.app')
   })
 })
+
+describe('CLIENT_ORIGIN', () => {
+  const { allowOrigin } = require('../src/app')
+  test('acepta la direccion exacta, con o sin barra final', () => {
+    expect(allowOrigin('https://orbezu.vercel.app', ['https://orbezu.vercel.app/'])).toBe(true)
+    expect(allowOrigin('https://otra.vercel.app', ['https://orbezu.vercel.app'])).toBe(false)
+  })
+  test('acepta comodines para las direcciones de Vercel', () => {
+    const list = ['https://orbezu*.vercel.app']
+    expect(allowOrigin('https://orbezu-git-main-royzeer.vercel.app', list)).toBe(true)
+    expect(allowOrigin('https://orbezu.vercel.app', list)).toBe(true)
+    expect(allowOrigin('https://malo.com/orbezu.vercel.app', list)).toBe(false)
+    expect(allowOrigin('https://orbezu.vercel.app.evil.com', list)).toBe(false)
+  })
+})

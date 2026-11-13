@@ -131,7 +131,7 @@ npm test
 | Variable | Para qué sirve |
 | --- | --- |
 | `JWT_SECRET` | Clave para firmar las sesiones. Obligatoria. |
-| `CLIENT_ORIGIN` | Direcciones del frontend permitidas, separadas por comas. |
+| `CLIENT_ORIGIN` | Direcciones del frontend permitidas, separadas por comas. Acepta comodines, por ejemplo `https://orbezu*.vercel.app` para cubrir todas las direcciones que da Vercel. |
 | `DATABASE_URL` | Service URI de Aiven. Si está vacía se usan `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME`. |
 | `DB_SSL_CA` | Contenido del certificado `ca.pem` de Aiven, para que la conexión sea cifrada y verificada. |
 | `GOOGLE_CLIENT_ID` | El mismo Client ID del frontend. El servidor lo usa para verificar el token de Google. |

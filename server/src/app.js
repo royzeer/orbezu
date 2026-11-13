@@ -18,6 +18,18 @@ const publicUser = (u) => ({
   hasGoogle: !!u.googleId
 })
 
+/** Compara el origen con CLIENT_ORIGIN. Acepta comodines, por ejemplo https://orbezu*.vercel.app */
+function allowOrigin(origin, list) {
+  const clean = (u) => u.trim().replace(/\/+$/, '').toLowerCase()
+  const o = clean(origin)
+  return list.some((entry) => {
+    const e = clean(entry)
+    if (!e.includes('*')) return e === o
+    const re = new RegExp('^' + e.split('*').map((x) => x.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('[a-z0-9-]*') + '$')
+    return re.test(o)
+  })
+}
+
 class HttpError extends Error {
   constructor(status, message) {
     super(message)
@@ -36,7 +48,11 @@ function createApp({ repo, mailer, verifyGoogle, config }) {
   app.use(helmet())
   app.use(
     cors({
-      origin: (origin, cb) => cb(null, !origin || config.clientOrigins.includes(origin)),
+      origin: (origin, cb) => {
+        const ok = !origin || allowOrigin(origin, config.clientOrigins)
+        if (!ok) console.warn(`[cors] Origen rechazado: ${origin}. Agregalo a CLIENT_ORIGIN.`)
+        cb(null, ok)
+      },
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
       allowedHeaders: ['Content-Type', 'Authorization']
     })
@@ -176,4 +192,4 @@ function createApp({ repo, mailer, verifyGoogle, config }) {
   return app
 }
 
-module.exports = { createApp, publicUser }
+module.exports = { createApp, publicUser, allowOrigin }
