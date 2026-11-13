@@ -1,0 +1,26 @@
+# Lanza los recordatorios de repaso una vez al dia llamando a la API.
+# Sirve como respaldo de node-cron cuando el servidor gratuito de Render esta dormido.
+# Necesita los secretos ORBEZU_API_URL y CRON_SECRET en el repositorio.
+name: Recordatorios diarios
+
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar a la API
+        env:
+          API_URL: ${{ secrets.ORBEZU_API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$API_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "Faltan los secretos ORBEZU_API_URL o CRON_SECRET. No se hace nada."
+            exit 0
+          fi
+          # El primer intento despierta al servidor si estaba dormido.
+          curl -s -m 90 "$API_URL/api/health" || true
+          curl -sf -m 90 -X POST -H "x-cron-secret: $CRON_SECRET" "$API_URL/api/cron/reminders"
