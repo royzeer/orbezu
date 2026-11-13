@@ -120,3 +120,13 @@ describe('progreso y recordatorios', () => {
     expect(repo.users.size).toBe(0)
   })
 })
+
+describe('raíz de la API', () => {
+  test('lleva a la app publicada', async () => {
+    const { repo } = setup()
+    const app = createApp({ repo, mailer: {}, verifyGoogle: async () => ({}), config: { ...config, appUrl: 'https://orbezu.vercel.app' } })
+    const res = await request(app).get('/')
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toBe('https://orbezu.vercel.app')
+  })
+})

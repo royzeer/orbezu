@@ -64,6 +64,12 @@ function createApp({ repo, mailer, verifyGoogle, config }) {
     next()
   }
 
+  // La raiz de la API no es la app: lleva a la app publicada (Vercel).
+  app.get('/', (_req, res) => {
+    if (config.appUrl && !config.appUrl.includes('localhost')) return res.redirect(config.appUrl)
+    res.json({ ok: true, message: 'Esta es la API de Orbezu. La app se abre desde el frontend (Vercel).' })
+  })
+
   app.get('/api/health', async (_req, res) => {
     let db = 'ok'
     try {
